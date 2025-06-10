@@ -15,3 +15,16 @@ def test_oracle_connection():
     except Exception as e:
         print(f"Connection failed: {e}")
 
+
+def insert_banks(conn, banks):
+    cursor = conn.cursor()
+    bank_ids = {}
+    for bank in banks:
+        cursor.execute(
+            "MERGE INTO banks b USING (SELECT :name AS name, :app_id AS app_id FROM dual) d ON (b.name = d.name) " +
+            "WHEN NOT MATCHED THEN INSERT (name, app_id) VALUES (:name, :app_id) RETURNING id INTO :id",
+            {"name": bank["name"], "app_id": bank["app_id"], "id": bank_ids.setdefault(bank["name"], None)}
+        )
+        cursor.execute("SELECT id FROM banks WHERE name=:name", {"name": bank["name"]})
+        bank_ids[bank["name"]] = cursor.fetchone()[0]
+    return bank_ids
