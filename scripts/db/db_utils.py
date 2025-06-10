@@ -49,3 +49,21 @@ def insert_reviews(conn, df, bank_ids):
             }
         )
     conn.commit()
+
+
+
+
+
+if __name__ == "__main__":
+    test_oracle_connection()
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else "data/reviews_sentiment.csv"
+    df = pd.read_csv(csv_path)
+    banks = [
+        {"name": "Commercial Bank of Ethiopia", "app_id": "com.combanketh.mobilebanking"},
+        {"name": "Bank of Abyssinia", "app_id": "com.boa.boaMobileBanking"},
+        {"name": "Dashen Bank", "app_id": "com.dashen.dashensuperapp"}
+    ]
+    conn = oracledb.connect(**ORACLE_DB_CONFIG)
+    bank_ids = insert_banks(conn, banks)
+    insert_reviews(conn, df, bank_ids)
+    print("Inserted reviews:", len(df))
