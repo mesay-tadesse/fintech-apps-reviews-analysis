@@ -18,3 +18,16 @@ def plot_sentiment_trends(df: pd.DataFrame, date_col: str = 'date', sentiment_co
         plt.ylabel('Count')
         plt.legend(title='Sentiment')
         plt.show()
+
+
+
+def plot_rating_distribution(df: pd.DataFrame, rating_col: str = 'rating', bank_col: str = 'bank'):
+    """
+    Plot rating distributions for each bank.
+    """
+    for bank in df[bank_col].unique():
+        sns.histplot(df[df[bank_col] == bank][rating_col], bins=5, kde=True)
+        plt.title(f'Rating Distribution for {bank}')
+        plt.xlabel('Rating')
+        plt.ylabel('Count')
+        plt.show()
