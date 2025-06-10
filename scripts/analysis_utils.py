@@ -2,6 +2,8 @@ import pandas as pd
 from collections import Counter
 from typing import Tuple, List, Dict
 
+
+
 def note_biases(df: pd.DataFrame, sentiment_col: str = 'sentiment', rating_col: str = 'rating') -> str:
     """
     Identify and note potential review biases in the dataset.
@@ -40,8 +42,27 @@ def extract_drivers_painpoints(df: pd.DataFrame, sentiment_col: str = 'sentiment
         results[bank] = {'drivers': drivers, 'painpoints': painpoints}
     return results
 
+
 def compare_banks(df: pd.DataFrame, bank_col: str = 'bank', sentiment_col: str = 'sentiment') -> pd.DataFrame:
     """
     Compare banks by sentiment counts and return a summary DataFrame.
     """
     return df.groupby([bank_col, sentiment_col]).size().unstack(fill_value=0)
+
+
+
+def generate_recommendations(insights: Dict[str, Dict[str, List[str]]]) -> Dict[str, List[str]]:
+    """
+    Generate improvement recommendations for each bank based on pain points and drivers.
+    Returns a dictionary: {bank: [recommendations]}
+    """
+    recs = {}
+    for bank, vals in insights.items():
+        recs[bank] = []
+        # Suggest addressing pain points
+        for pain in vals['painpoints']:
+            recs[bank].append(f"Address customer concern: '{pain}' (e.g., improve this area)")
+        # Suggest leveraging drivers
+        for driver in vals['drivers']:
+            recs[bank].append(f"Promote strength: '{driver}' (e.g., highlight in marketing)")
+    return recs
