@@ -28,3 +28,24 @@ def insert_banks(conn, banks):
         cursor.execute("SELECT id FROM banks WHERE name=:name", {"name": bank["name"]})
         bank_ids[bank["name"]] = cursor.fetchone()[0]
     return bank_ids
+
+
+
+
+def insert_reviews(conn, df, bank_ids):
+    cursor = conn.cursor()
+    for _, row in df.iterrows():
+        cursor.execute(
+            "INSERT INTO reviews (bank_id, review, rating, review_date, source, sentiment_label, sentiment_score) " +
+            "VALUES (:bank_id, :review, :rating, TO_DATE(:review_date, 'YYYY-MM-DD'), :source, :sentiment_label, :sentiment_score)",
+            {
+                "bank_id": bank_ids[row["bank"]],
+                "review": row["review"],
+                "rating": row["rating"],
+                "review_date": row["date"],
+                "source": row["source"],
+                "sentiment_label": row.get("sentiment_label", None),
+                "sentiment_score": row.get("sentiment_score", None)
+            }
+        )
+    conn.commit()
